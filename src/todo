@@ -1,0 +1,2 @@
+- fix the editor going bye bye when a reporter is inserted and removed from inserted
+- - maybe just prevent reporters from being inserted?

@@ -1,14 +1,23 @@
 // @ts-nocheck
 ;(async function (Scratch) {
   if (Scratch.extensions.unsandboxed === false) {
-    throw new Error('Sandboxed mode is not supported')
+    alert("Simple ShaderEditor must be run unsandboxed")
+    throw new Error('Simple ShaderEditor must be run unsandboxed')
   }
   const config = await import('./config')
   const vm = Scratch.vm
   const runtime = vm.runtime
+  const gl = runtime.renderer.gl
   const monaco = await import('./MonacoEditor/monaco')
   const MonacoEditor = new monaco.MonacoEditor(Scratch)
   await MonacoEditor.init()
+
+  let penPlus = runtime.ext_obviousalexc_penPlus
+  if (!penPlus) {
+    runtime.on("EXTENSION_ADDED", () => {
+      penPlus = Scratch.vm.runtime.ext_obviousalexc_penPlus;
+    })
+  }
   class QuakeEditor {
     getInfo() {
       return {
@@ -16,49 +25,49 @@
         name: config.name,
         blocks: [
           {
+            blockType:Scratch.BlockType.LABEL,
+            text:"put a random pen+"
+          },
+          {
             blockType: Scratch.BlockType.REPORTER,
             outputShape: 3,
             opcode: 'glslTextEditor',
-            text: 'test [code]',
+            text: 'create vertex shader: [vertex] fragment shader: [fragment]',
             arguments: {
-              code: {
+              vertex: {
                 type: 'code_glsl',
-                defaultValue: `uniform float speed;
-uniform float xDistortion;
-uniform float xMagnitude;
-uniform float yDistortion;
-uniform float yMagnitude;
-
-void main() {
-    float slowerTime = speed * time;
-
-    // Time-dependent periodic disturbance
-    float dx = xDistortion * sin(vUv.y * xMagnitude + slowerTime);
-    float dy = yDistortion * sin(vUv.x * yMagnitude + slowerTime);
-    
-    // Shift UV coordinates over time
-    vec2 disturbedUv = vec2(vUv.x + dx, vUv.y + dy);
-
-    // Sample the texture at the disturbed UV coordinates
-    vec4 color = texture(tDiffuse, disturbedUv);
-
-    fragColor = color;
-}` //#ff0000,
+                defaultValue: config.defaultVertexShader
+              },
+              fragment: {
+                type: 'code_glsl',
+                defaultValue: config.defaultFragmentShader
               }
             }
           },
           {
             blockType: Scratch.BlockType.COMMAND,
-            opcode: 'setShaderData',
-            text: 'Set Shader [a]',
+            opcode: 'createShader',
+            text: 'Create shader called [name] from [data]',
             arguments: {
-              a: {
-                type: 'string',
-                defaultValue: '3'
+              name: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: "test"
+              },
+              data: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: "insert data from create vertex/fragment shader here"
               }
             }
           }
         ],
+
+        menus: {
+          penPlusShaders: {
+            items: "shaderMenu",
+            acceptReporters: true,
+          }
+        },
+
         customFieldTypes: Object.fromEntries(
           MonacoEditor.languages.map(v => [
             `code_${v}`,
@@ -67,8 +76,23 @@ void main() {
         )
       }
     }
-    glslTextEditor({ code }, util) {
-      return Scratch.Cast.toString(code)
+    shaderMenu() {
+      //taken from shaded
+      if (penPlus) {
+        return penPlus.shaderMenu();
+      }
+      return ["None Yet"];
+    }
+
+    glslTextEditor({ vertex, fragment }, util) {
+      return {
+        vertShader: vertex,
+        fragShader: fragment
+      }
+    }
+
+    createShader({ name, data}) {
+      // somehow register the shader to pen+
     }
   }
   Scratch.extensions.register(new QuakeEditor())
