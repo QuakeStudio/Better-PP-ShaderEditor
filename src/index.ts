@@ -86,13 +86,13 @@
 
     glslTextEditor({ vertex, fragment }, util) {
       return {
-        vertShader: vertex,
-        fragShader: fragment
+        vertShader: vertex.trim(),
+        fragShader: fragment.trim()
       }
     }
 
     createShader({ name, data}) {
-      // somehow register the shader to pen+
+      penPlus.saveShader(name, data)
     }
   }
   Scratch.extensions.register(new QuakeEditor())
