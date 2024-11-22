@@ -1,19 +1,18 @@
 import { defineConfig } from 'tsup'
 
 export default defineConfig({
-  name: 'scratch-ext', // Replace it with your extension name
+  name: 'simple-shader-editor', // Replace it with your extension name
   entry: ['src/index.ts', 'src/index.js'],
   target: ['esnext'],
   format: ['iife'],
   outDir: 'dist',
   banner: {
     // Replace it with your extension's metadata
-    js: `// Name: FurryR's example Extension
-// ID: newExtension
-// Description: Scaffolding for Advanced Scratch extensions.
-// By: You
-// Original: Me
-// License: MPL-2.0
+    js: `// Name: Simple ShaderEditor
+// ID: simple-shader-editor
+// Description: A Very Simple Shader Editor for Pen+.
+// By: Fath11<https://github.com/fath11>
+// License: LGPLv3
 `
   },
   platform: 'browser',

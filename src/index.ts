@@ -4,7 +4,6 @@
     throw new Error('Sandboxed mode is not supported')
   }
   const config = await import('./config')
-  const id = config.id
   const vm = Scratch.vm
   const runtime = vm.runtime
   const monaco = await import('./MonacoEditor/monaco')
@@ -13,8 +12,8 @@
   class QuakeEditor {
     getInfo() {
       return {
-        id,
-        name: 'QuakeEditor',
+        id: config.id,
+        name: config.name,
         blocks: [
           {
             blockType: Scratch.BlockType.REPORTER,
@@ -49,9 +48,9 @@ void main() {
             }
           },
           {
-            blockType: Scratch.BlockType.REPORTER,
-            opcode: 'test',
-            text: 'test [a]',
+            blockType: Scratch.BlockType.COMMAND,
+            opcode: 'setShaderData',
+            text: 'Set Shader [a]',
             arguments: {
               a: {
                 type: 'string',
@@ -68,7 +67,7 @@ void main() {
         )
       }
     }
-    async glslTextEditor({ code }, util) {
+    glslTextEditor({ code }, util) {
       return Scratch.Cast.toString(code)
     }
   }
