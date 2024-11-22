@@ -5,7 +5,6 @@ export const defaultFragmentShader: String =
 `varying highp vec2 v_texCoord;
 
 uniform sampler2D u_drawTex;
-uniform float color;
 
 void main()
 {
